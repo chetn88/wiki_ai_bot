@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Research & Download Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            AI Research Hub <span>v4.0</span>
+        </div>
+        <nav>
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">Search Hub</a>
+            <a href="/bookmarks" class="{% if request.path == '/bookmarks' %}active{% endif %}">Vault</a>
+            <a href="/text-tools" class="{% if request.path == '/text-tools' %}active{% endif %}">Text Tools</a>
+            <a href="/dashboard" class="{% if request.path == '/dashboard' %}active{% endif %}">Analytics</a>
+            <a href="/admin" class="{% if request.path == '/admin' %}active{% endif %}">Admin</a>
+            <a href="/about" class="{% if request.path == '/about' %}active{% endif %}">Docs</a>
+            <!-- Theme Toggle Button -->
+            <button onclick="toggleTheme()" id="themeBtn" style="background: var(--accent-blue-light); color: var(--accent-blue); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-left: 10px;">🌓 Theme</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>&copy; 2026 AI Research & Download Hub &mdash; Enterprise Intelligence Suite</p>
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        // Remember theme preference
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>

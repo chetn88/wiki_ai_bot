@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- SaaS Style Stats Bar -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center;">
+        <h4 style="font-size: 24px; color: var(--accent-blue); margin-bottom: 4px;">15K+</h4>
+        <p style="font-size: 13px; color: var(--text-muted);">Queries Processed</p>
+    </div>
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center;">
+        <h4 style="font-size: 24px; color: var(--accent-green); margin-bottom: 4px;">99.4%</h4>
+        <p style="font-size: 13px; color: var(--text-muted);">Synthesis Accuracy</p>
+    </div>
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center;">
+        <h4 style="font-size: 24px; color: #7c3aed; margin-bottom: 4px;">3+</h4>
+        <p style="font-size: 13px; color: var(--text-muted);">Languages Supported</p>
+    </div>
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center;">
+        <h4 style="font-size: 24px; color: #ea580c; margin-bottom: 4px;">< 25s</h4>
+        <p style="font-size: 13px; color: var(--text-muted);">Report Compilation</p>
+    </div>
+</div>
+
+<!-- Main Hero Search Card -->
+<div class="card">
+    <span style="color: var(--accent-blue); background: var(--accent-blue-light); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 12px;">AI-Powered Knowledge Extraction</span>
+    <h1 style="font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; color: var(--text-main);">Extract & Synthesize Knowledge with AI</h1>
+    <p style="color: var(--text-muted); font-size: 16px; line-height: 1.6; margin-bottom: 25px;">Search any global concept, translate instantly across languages, listen via voice narration, and compile production-ready PDF reports in seconds.</p>
+
+    <!-- Search Form with Both Text and Voice Options -->
+    <form method="POST" id="searchForm">
+        <div style="display: flex; flex: 1; position: relative; min-width: 280px;">
+            <input type="text" id="searchInput" name="topic" placeholder="Type here or click Mic to speak..." required value="{{ query or '' }}" style="width: 100%; padding-right: 45px;">
+            <button type="button" id="micBtn" onclick="startVoiceSearch()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 20px; cursor: pointer; transition: 0.2s;" title="Click to speak">🎙️</button>
+        </div>
+        
+        <select name="language">
+            <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+            <option value="mr" {% if lang == 'mr' %}selected{% endif %}>मराठी (Marathi)</option>
+            <option value="hi" {% if lang == 'hi' %}selected{% endif %}>हिन्दी (Hindi)</option>
+        </select>
+        <button type="submit">Execute Search</button>
+    </form>
+
+    <!-- Voice Search Logic -->
+    <script>
+        function startVoiceSearch() {
+            if (window.hasOwnProperty('webkitSpeechRecognition') || window.hasOwnProperty('SpeechRecognition')) {
+                var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                var recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = "en-US"; 
+                
+                var micBtn = document.getElementById('micBtn');
+                micBtn.innerHTML = "🔴"; 
+                micBtn.style.animation = "pulse 1s infinite";
+                document.getElementById('searchInput').placeholder = "Listening... Speak now!";
+                
+                recognition.start();
+                
+                recognition.onresult = function(e) {
+                    document.getElementById('searchInput').value = e.results[0][0].transcript;
+                    recognition.stop();
+                    document.getElementById('searchForm').submit();
+                };
+                
+                recognition.onerror = function(e) {
+                    recognition.stop();
+                    micBtn.innerHTML = "🎙️";
+                    micBtn.style.animation = "none";
+                    document.getElementById('searchInput').placeholder = "Type here or click Mic to speak...";
+                    alert("Mic error: " + e.error + ". Please check your microphone.");
+                };
+            } else {
+                alert("Sorry, Voice Search is not supported in this browser. Please use Google Chrome.");
+            }
+        }
+    </script>
+    <style>
+        @keyframes pulse {
+            0% { transform: translateY(-50%) scale(1); opacity: 1; }
+            50% { transform: translateY(-50%) scale(1.2); opacity: 0.7; }
+            100% { transform: translateY(-50%) scale(1); opacity: 1; }
+        }
+    </style>
+
+    {% if error %}
+        <div class="error-banner">{{ error }}</div>
+    {% endif %}
+
+    {% if summary %}
+        <div style="margin-top: 35px; border-top: 1px solid var(--border-color); padding-top: 30px;">
+            <h2 style="font-size: 26px; color: var(--text-main); margin-bottom: 20px;">{{ title }}</h2>
+            
+            {% if image_url %}
+                <img src="{{ image_url }}" alt="{{ title }}" style="max-height: 300px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            {% endif %}
+
+            <!-- ChatGPT Style Typing Effect -->
+            <div id="rawSummary" style="display: none;">{{ summary }}</div>
+            <p id="typedSummary" style="line-height: 1.8; color: var(--text-muted); font-size: 16px; margin-bottom: 30px; min-height: 80px; border-left: 3px solid var(--accent-blue); padding-left: 15px;"></p>
+            
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const text = document.getElementById('rawSummary').innerText;
+                    const target = document.getElementById('typedSummary');
+                    let i = 0;
+                    target.innerHTML = "";
+                    function typeWriter() {
+                        if (i < text.length) {
+                            target.innerHTML += text.charAt(i);
+                            i++;
+                            setTimeout(typeWriter, 12); // Typing Speed
+                        }
+                    }
+                    typeWriter();
+                });
+            </script>
+            
+            <!-- Audio Player -->
+            <div style="background: var(--bg-primary); padding: 18px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 25px;">
+                <p style="font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 10px;">🔊 AI Voice Narration & Speed Control:</p>
+                <audio id="aiAudio" controls style="width: 100%; margin-bottom: 12px;">
+                    <source src="{{ url_for('static', filename='audio/output.mp3') }}" type="audio/mp3">
+                </audio>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" onclick="setSpeed(1.0)" style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 5px 12px; font-size: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">1.0x</button>
+                    <button type="button" onclick="setSpeed(1.5)" style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 5px 12px; font-size: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">1.5x</button>
+                    <button type="button" onclick="setSpeed(2.0)" style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 5px 12px; font-size: 12px; border-radius: 6px; font-weight: 600; cursor: pointer;">2.0x</button>
+                </div>
+                <script>function setSpeed(rate) { document.getElementById('aiAudio').playbackRate = rate; }</script>
+            </div>
+
+            <!-- AI Auto-Quiz -->
+            {% if quiz_data %}
+            <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; margin-bottom: 25px;">
+                <h3 style="font-size: 18px; color: var(--accent-blue); margin-bottom: 15px;">🧠 AI Knowledge Check</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Test what you just learned.</p>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    {% for item in quiz_data %}
+                    <div style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <p style="font-size: 14px; color: var(--text-main); font-weight: 500; margin-bottom: 10px;">{{ loop.index }}. {{ item.question }}</p>
+                        <button onclick="document.getElementById('ans-{{ loop.index }}').style.display='block'" style="background: var(--accent-blue-light); color: var(--accent-blue); border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">Reveal Answer</button>
+                        <span id="ans-{{ loop.index }}" style="display: none; margin-top: 10px; color: var(--accent-green); font-weight: 700; font-size: 14px;">Answer: {{ item.answer }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons (PDF, Vault, WhatsApp) -->
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <form action="/download_pdf" method="POST" style="margin: 0;">
+                    <input type="hidden" name="pdf_title" value="{{ title }}">
+                    <input type="hidden" name="pdf_content" value="{{ summary }}">
+                    <button type="submit" style="background: var(--accent-green); color: #fff; padding: 10px 18px; font-size: 13px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">Download PDF Report</button>
+                </form>
+
+                <form action="/bookmark" method="POST" style="margin: 0;">
+                    <input type="hidden" name="title" value="{{ title }}">
+                    <input type="hidden" name="summary" value="{{ summary }}">
+                    <input type="hidden" name="url" value="{{ url }}">
+                    <button type="submit" style="background: #7c3aed; color: #fff; padding: 10px 18px; font-size: 13px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">Save to Vault</button>
+                </form>
+
+                <!-- NEW: WhatsApp Share Button -->
+                <a href="https://api.whatsapp.com/send?text=Check out this AI summary on *{{ title }}*:%0A%0A{{ summary[:150] }}...%0A%0AGenerated via AI Research Hub!" target="_blank" style="background: #25D366; color: #fff; padding: 10px 18px; font-size: 13px; border-radius: 8px; border: none; font-weight: 600; text-decoration: none; cursor: pointer;">Share on WhatsApp</a>
+
+                {% if url != '#' %}
+                    <a href="{{ url }}" target="_blank" style="color: var(--accent-blue); text-decoration: none; font-size: 14px; font-weight: 600; margin-left: auto;">Source Archive &rarr;</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

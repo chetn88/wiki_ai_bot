@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h2>System Architecture & Documentation</h2>
+    <p style="color: var(--text-muted); margin-bottom: 25px; line-height: 1.6;">
+        CognitiveEngine is an enterprise-grade multi-module knowledge extraction and translation suite designed for high-performance academic and corporate research.
+    </p>
+
+    <h3 style="color: var(--accent-blue); margin-bottom: 12px; font-size: 18px;">Core Technical Specifications</h3>
+    <ul style="color: var(--text-muted); padding-left: 20px; line-height: 1.8; margin-bottom: 25px;">
+        <li><b>Backend Framework:</b> Python Flask (MVC Architecture)</li>
+        <li><b>Database Persistence:</b> SQLite Relational Database for audit logs and bookmarks</li>
+        <li><b>Knowledge Engine:</b> Wikipedia REST API & OpenSearch integration with fuzzy error mitigation</li>
+        <li><b>Localization Pipeline:</b> <code>deep-translator</code> module supporting real-time cross-lingual translation</li>
+        <li><b>Report Generation:</b> Dynamic in-memory PDF compilation via ReportLab</li>
+    </ul>
+
+    <h3 style="color: var(--accent-blue); margin-bottom: 12px; font-size: 18px;">Developer & Compliance</h3>
+    <p style="color: var(--text-muted); line-height: 1.6;">
+        Engineered for high availability, fault-tolerant exception handling, and secure client-side reporting. Fully optimized for cross-platform deployment.
+    </p>
+</div>
+{% endblock %}

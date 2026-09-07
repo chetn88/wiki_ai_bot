@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Saved Knowledge Vault</h2>
+<p style="color: #94a3b8; margin-bottom: 20px;">Permanently stored research articles and notes.</p>
+
+{% if bookmarks %}
+    {% for item in bookmarks %}
+    <div class="card" style="margin-bottom: 20px; position: relative;">
+        <h3 style="color: #38bdf8; margin-top:0;">{{ item[1] }}</h3>
+        <p style="color: #cbd5e1; line-height: 1.6; margin-top: 10px;">{{ item[2] }}</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; font-size: 13px; color: #94a3b8; flex-wrap: wrap; gap: 10px;">
+            <span>Saved on: {{ item[4] }}</span>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                {% if item[3] != '#' %}
+                    <a href="{{ item[3] }}" target="_blank" style="color: #38bdf8; text-decoration: none;">Original Source &rarr;</a>
+                {% endif %}
+                <form action="/delete_bookmark/{{ item[0] }}" method="POST" style="margin: 0;">
+                    <button type="submit" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); padding: 5px 10px; font-size: 12px; border-radius: 6px; cursor: pointer;">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="card">
+        <p style="color: #94a3b8;">No bookmarks saved yet. Search a topic and save it to your vault!</p>
+    </div>
+{% endif %}
+{% endblock %}
